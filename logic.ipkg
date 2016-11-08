@@ -1,0 +1,16 @@
+package logic
+
+pkgs       = bifunctors
+sourcedir  = src
+modules    = Data.Logic
+-- tests      =
+
+brief      = "Propositional logic tools, inpsired by the Coq standard library."
+version    = 0.0.1
+readme     = README.md
+license    = MIT
+author     = "Eric Bailey"
+
+homepage   = https://github.com/yurrriq/idris-logic
+sourceloc  = https://github.com/yurrriq/idris-logic
+bugtracker = https://github.com/yurrriq/idris-logic/issues
