@@ -1,12 +1,13 @@
 package logic
 
 pkgs       = bifunctors
+opts       = "--total"
 sourcedir  = src
 modules    = Data.Logic
--- tests      =
+-- TODO: tests
 
 brief      = "Propositional logic tools, inpsired by the Coq standard library."
-version    = 0.0.1
+-- TODO: version
 readme     = README.md
 license    = MIT
 author     = "Eric Bailey"
