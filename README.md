@@ -1,19 +1,70 @@
-Logic
-=====
-
 ```idris
+||| An Idris port of Coq.Init.Logic
 module Logic
 
 import Data.Bifunctor
 
-%default total
-
 %access export
 ```
-Iff
----
+Propositional connectives
+=========================
 
-The following `iff`-related functions are ported from [`Coq.Init.Logic`](https://coq.inria.fr/library/Coq.Init.Logic.html).
+Unit
+----
+
+`()` is the always true proposition (⊤).
+
+```idris
+%elim data Unit = MkUnit
+```
+Void
+----
+
+`Void` is the always false proposition (⊥).
+
+```idris
+%elim data Void : Type where
+```
+Negation
+--------
+
+`Not a`, written `~a`, is the negation of `a`.
+
+```idris
+Not : Type -> Type
+Not a = a -> Void
+```
+```idris
+syntax "~" [x] = (Not x)
+```
+Conjunction
+-----------
+
+`And a b`, written `(a, b)`, is the conjunction of `a` and `b`.
+
+`Conj p q` is a proof of `(a, b)` as soon as `p` is a proof of `a` and `q` a proof of `b`.
+
+`proj1` and `proj2` are first and second projections of a conjunction.
+
+```idris
+syntax "(" [a] "," [b] ")" = (And a b)
+
+data And : Type -> Type -> Type where
+     Conj : a -> b -> (a, b)
+
+implementation Bifunctor And where
+    bimap f g (Conj a b) = Conj (f a) (g b)
+
+proj1 : (a, b) -> a
+proj1 (Conj a _) = a
+
+proj2 : (a, b) -> b
+proj2 (Conj _ b) = b
+```
+Biconditional
+-------------
+
+<!-- $\varphi \vdash \psi$\ --> <!-- $\underline{\psi \vdash \varphi}$\ --> <!-- $\varphi \iff \psi$ -->
 
 `iff a b`, written `a <-> b`, expresses the equivalence of `a` and `b`.
 
@@ -24,144 +75,240 @@ public export
 (<->) : Type -> Type -> Type
 (<->) a b = (a -> b, b -> a)
 ```
-*A* ↔ *A*
+### Biconditional is Reflexive
+
+[Proof Wiki](https://proofwiki.org/wiki/Biconditional_is_Reflexive)
+
+⊢*φ* ⇔ *φ*
 
 ```idris
-iff_refl : a <-> a
-iff_refl = (id, id)
+iffRefl : a <-> a
+iffRefl = Conj id id
 ```
-(*A* ↔ *B*)→(*B* ↔ *C*)→(*A* ↔ *C*)
+### Biconditional is Transitive
+
+[Proof Wiki](https://proofwiki.org/wiki/Biconditional_is_Transitive)
+
+<!-- \[ --> <!--   \begin{prooftree} --> <!--     \Hypo{ \varphi \iff \psi } --> <!--     \Hypo{ \psi \iff \chi } --> <!--     \Infer2 { \vdash \varphi \iff \chi } --> <!--   \end{prooftree} --> <!-- \] -->
 
 ```idris
-iff_trans : (a <-> b) -> (b <-> c) -> (a <-> c)
-iff_trans (ab, ba) (bc, cb) = (bc . ab, ba . cb)
+iffTrans : (a <-> b) -> (b <-> c) -> (a <-> c)
+iffTrans (Conj ab ba) (Conj bc cb) =
+    Conj (bc . ab) (ba . cb)
 ```
-(*A* ↔ *B*)→(*B* ↔ *A*)
+### Biconditional is Commutative
+
+[Proof Wiki](https://proofwiki.org/wiki/Biconditional_is_Commutative)
+
+*φ* ⇔ *ψ* ⊣ ⊢*ψ* ⇔ *φ*
+
+or
+
+⊢(*φ* ⇔ *ψ*)⇔(*ψ* ⇔ *φ*)
 
 ```idris
-iff_sym : (a <-> b) -> (b <-> a)
-iff_sym = swap
+iffSym : (a <-> b) -> (b <-> a)
+iffSym (Conj ab ba) = Conj ba ab
 ```
-Since (*A* ∧ *B*)→*B* and (*A* ∧ *C*)→*C*, (*B* ↔ *C*)→((*A* ∧ *B*)↔(*A* ∧ *C*)).
+### andIffCompatLeft
+
+*ψ* ⇔ *χ* ⊣ ⊢(*φ* ∧ *ψ*)⇔(*φ* ∧ *χ*)
 
 ```idris
-and_iff_compat_l : (b <-> c) -> ((a, b) <-> (a, c))
-and_iff_compat_l = bimap second second
+andIffCompatLeft : (b <-> c) -> ((a, b) <-> (a, c))
+andIffCompatLeft = bimap second second
 ```
-Since (*B* ∧ *A*)→*B* and (*C* ∧ *A*)→*C*, (*B* ↔ *C*)→((*B* ∧ *A*)↔(*C* ∧ *A*)).
+### andIffCompatRight
+
+*ψ* ⇔ *χ* ⊣ ⊢(*ψ* ∧ *φ*)⇔(*χ* ∧ *φ*)
 
 ```idris
-and_iff_compat_r : (b <-> c) -> ((b, a) <-> (c, a))
-and_iff_compat_r = bimap first first
+andIffCompatRight : (b <-> c) -> ((b, a) <-> (c, a))
+andIffCompatRight = bimap first first
 ```
-Since *B* → (*A* ∨ *B*) and *C* → (*A* ∨ *C*), (*B* ↔ *C*)→((*A* ∨ *B*)↔(*A* ∨ *C*)).
+### orIffCompatLeft
+
+*ψ* ⇔ *χ* ⊢ (*φ* ∨ *ψ*)⇔(*φ* ∨ *χ*)
 
 ```idris
-or_iff_compat_l : (b <-> c) -> (Either a b <-> Either a c)
-or_iff_compat_l = bimap second second
+orIffCompatLeft : (b <-> c) ->
+                  (Either a b <-> Either a c)
+orIffCompatLeft = bimap second second
 ```
-Since *B* → (*B* ∨ *A*) and *C* → (*C* ∨ *A*), (*B* ↔ *C*)→((*B* ∨ *A*)↔(*C* ∨ *A*)).
+### orIffCompatRight
+
+*ψ* ⇔ *χ* ⊢ (*ψ* ∨ *φ*)⇔(*χ* ∨ *φ*)
 
 ```idris
-or_iff_compat_r : (b <-> c) -> (Either b a <-> Either c a)
-or_iff_compat_r = bimap first first
+orIffCompatRight : (b <-> c) ->
+                   (Either b a <-> Either c a)
+orIffCompatRight = bimap first first
 ```
-¬*A* ↔ (*A* ↔ ⊥)
+### negVoid
+
+¬*φ* ⊣ ⊢*φ* ⇔ ⊥
+
+or
+
+⊢¬*φ* ⇔ (*φ* ⇔ ⊥)
 
 ```idris
-neg_void : Not a <-> (a <-> Void)
-neg_void = (flip MkPair void, fst)
+negVoid : (~a) <-> (a <-> Void)
+negVoid = Conj (flip Conj void) proj1
 ```
-Given *B* → *A* and *C* → *A*, ((*A* ∧ *B*)↔(*A* ∧ *C*)) ↔ (*B* ↔ *C*).
+### andCancelLeft
+
+<!-- $\psi \implies \varphi$\ --> <!-- $\underline{\chi \implies \varphi}$\ --> <!-- $((\varphi \land \psi) \iff (\varphi \land \chi)) \iff (\psi \iff \chi)$ -->
 
 ```idris
-and_cancel_l : (b -> a) -> (c -> a) -> (((a, b) <-> (a, c)) <-> (b <-> c))
-and_cancel_l ba ca = (bimap f g, and_iff_compat_l)
+andCancelLeft : (b -> a) ->
+                (c -> a) ->
+                (((a, b) <-> (a, c)) <-> (b <-> c))
+andCancelLeft ba ca = Conj (bimap f g) andIffCompatLeft
   where
-    f pf b = snd $ pf (ba b, b)
-    g pg c = snd $ pg (ca c, c)
+    f h b = proj2 . h $ Conj (ba b) b
+    g h c = proj2 . h $ Conj (ca c) c
 ```
-Given *B* → *A* and *C* → *A*, ((*B* ∧ *A*)↔(*C* ∧ *A*)) ↔ (*B* ↔ *C*).
+### andCancelRight
 
 ```idris
-and_cancel_r : (b -> a) -> (c -> a) -> (((b, a) <-> (c, a)) <-> (b <-> c))
-and_cancel_r ba ca = (bimap f g, and_iff_compat_r)
+andCancelRight : (b -> a) ->
+                 (c -> a) ->
+                 (((b, a) <-> (c, a)) <-> (b <-> c))
+andCancelRight ba ca = Conj (bimap f g) andIffCompatRight
   where
-    f pf b = fst $ pf (b, ba b)
-    g pg c = fst $ pg (c, ca c)
+    f h b = proj1 . h $ Conj b (ba b)
+    g h c = proj1 . h $ Conj c (ca c)
 ```
-(*A* ∧ *B*)↔(*B* ∧ *A*)
+### Conjunction is Commutative
+
+[Proof Wiki](https://proofwiki.org/wiki/Rule_of_Commutation/Conjunction)
+
+#### Formulation 1
+
+*φ* ∧ *ψ* ⊣ ⊢*ψ* ∧ *φ*
+
+#### Formulation 2
+
+⊢(*φ* ∧ *ψ*)⇔(*ψ* ∧ *φ*)
+
+#### Source
 
 ```idris
-and_comm : (a, b) <-> (b, a)
-and_comm = (swap, swap)
+andComm : (a, b) <-> (b, a)
+andComm = Conj swap swap
+  where
+    swap : (p, q) -> (q, p)
+    swap (Conj p q) = Conj q p
 ```
-((*A* ∧ *B*)∧*C*)↔(*A* ∧ *B* ∧ *C*)
+### Conjunction is Associative
+
+[Proof Wiki](https://proofwiki.org/wiki/Rule_of_Association/Conjunction)
+
+#### Formulation 1
+
+(*φ* ∧ *ψ*)∧*χ* ⊣ ⊢*φ* ∧ (*ψ* ∧ *χ*)
+
+#### Formulation 2
+
+⊢((*φ* ∧ *ψ*)∧*χ*)⇔(*φ* ∧ (*ψ* ∧ *χ*))
+
+#### Source
 
 ```idris
-and_assoc : ((a, b), c) <-> (a, b, c)
-and_assoc = (\((a, b), c) => (a, b, c), \(a, b, c) => ((a, b), c))
+andAssoc : ((a, b), c) <-> (a, (b, c))
+andAssoc = Conj f g
+  where
+    f abc@(Conj (Conj a b) c) = Conj a (first proj2 abc)
+    g abc@(Conj a (Conj b c)) = Conj (second proj1 abc) c
 ```
-(*B* → ¬*A*)→(*C* → ¬*A*)→(((*A* ∨ *B*)↔(*A* ∨ *C*)) ↔ (*B* ↔ *C*))
+### orCancelLeft
+
+(*ψ* ⟹ ¬*φ*)⟹(*χ* ⟹ ¬*φ*)⟹(((*φ* ∨ *ψ*)⇔(*φ* ∨ *χ*)) ⇔ (*ψ* ⇔ *χ*))
 
 ```idris
-or_cancel_l : (b -> Not a)
-           -> (c -> Not a)
-           -> ((Either a b <-> Either a c) <-> (b <-> c))
-or_cancel_l bNotA cNotA = (bimap f g, or_iff_compat_l)
+orCancelLeft : (b -> ~a) -> (c -> ~a) ->
+               ((Either a b <-> Either a c) <-> (b <-> c))
+orCancelLeft bNotA cNotA = Conj (bimap f g) orIffCompatLeft
   where
     f ef b = go (bNotA b) (ef (Right b))
     g eg c = go (cNotA c) (eg (Right c))
-    go : Not a -> Either a b -> b
+    go : (~a) -> Either a b -> b
     go lf = either (void . lf) id
 ```
-(*B* → ¬*A*)→(*C* → ¬*A*)→(((*B* ∨ *A*)↔(*C* ∨ *A*)) ↔ (*B* ↔ *C*))
+### orCancelRight
+
+<!-- $\psi \vdash \neg \varphi$\ --> <!-- $\underline{\chi \vdash \neg \varphi}$\ --> <!-- $((\psi \lor \varphi) \iff (\chi \lor \varphi)) \iff (\psi \iff \chi)$ -->
 
 ```idris
-or_cancel_r : (b -> Not a)
-           -> (c -> Not a)
+orCancelRight : (b -> ~a)
+           -> (c -> ~a)
            -> ((Either b a <-> Either c a) <-> (b <-> c))
-or_cancel_r bNotA cNotA = (bimap f g, or_iff_compat_r)
+orCancelRight bNotA cNotA = Conj (bimap f g) orIffCompatRight
   where
     f ef b = go (bNotA b) (ef (Left b))
     g eg c = go (cNotA c) (eg (Left c))
-    go : Not p -> Either q p -> q
+    go : (~p) -> Either q p -> q
     go rf = either id (void . rf)
 ```
-(*A* ∨ *B*)↔(*B* ∨ *A*)
+### Disjunction is Commutative
+
+[Proof Wiki](https://proofwiki.org/wiki/Rule_of_Commutation/Disjunction)
+
+(*φ* ∨ *ψ*)⇔(*ψ* ∨ *φ*)
 
 ```idris
-or_comm : Either a b <-> Either b a
-or_comm = (mirror, mirror)
+orComm : Either a b <-> Either b a
+orComm = Conj mirror mirror
 ```
-((*A* ∨ *B*)∨*C*)→(*A* ∨ (*B* ∨ *C*))
+### Disjunction is Associative
+
+[Proof Wiki](https://proofwiki.org/wiki/Rule_of_Association/Disjunction)
+
+(*φ* ∨ *ψ*)∨*χ* ⊢ *φ* ∨ (*ψ* ∨ *χ*)
 
 ```idris
-or_assoc_lemma1 : Either (Either a b) c -> Either a (Either b c)
-or_assoc_lemma1 = either (second Left) (pure . pure)
+orAssocLeft : Either (Either a b) c -> Either a (Either b c)
+orAssocLeft = either (second Left) (pure . pure)
 ```
-(*A* ∨ (*B* ∨ *C*)) → ((*A* ∨ *B*)∨*C*)
+*φ* ∨ (*ψ* ∨ *χ*)⊢(*φ* ∨ *ψ*)∨*χ*
 
 ```idris
-or_assoc_lemma2 : Either a (Either b c) -> Either (Either a b) c
-or_assoc_lemma2 = either (Left . Left) (first Right)
+orAssocRight : Either a (Either b c) -> Either (Either a b) c
+orAssocRight = either (Left . Left) (first Right)
 ```
-((*A* ∨ *B*)∨*C*)↔(*A* ∨ (*B* ∨ *C*))
+#### Formulation 1
+
+(*φ* ∨ *ψ*)∨*χ* ⊣ ⊢*φ* ∨ (*ψ* ∨ *χ*)
+
+#### Formulation 2
+
+⊢((*φ* ∨ *ψ*)∨*χ*)⇔(*φ* ∨ (*ψ* ∨ *χ*))
+
+#### Source
 
 ```idris
-or_assoc : Either (Either a b) c <-> Either a (Either b c)
-or_assoc = (or_assoc_lemma1, or_assoc_lemma2)
+orAssoc : Either (Either a b) c <-> Either a (Either b c)
+orAssoc = Conj orAssocLeft orAssocRight
 ```
-(*A* ↔ *B*)→((*A* → *B*)∧(*B* → *A*))
+### iffAnd
+
+*φ* ⇔ *ψ* ⊢ (*φ* ⟹ *ψ*)∧(*ψ* ⟹ *φ*)
 
 ```idris
-iff_and : (a <-> b) -> (a -> b, b -> a)
-iff_and = id
+iffAnd : (a <-> b) -> (a -> b, b -> a)
+iffAnd = id
 ```
-(*A* ↔ *B*)↔((*A* → *B*)∧(*B* → *A*))
+### iffAndTo
+
+*φ* ⇔ *ψ* ⊣ ⊢(*φ* ⟹ *ψ*)∧(*ψ* ⟹ *φ*)
+
+or
+
+⊢(*φ* ⇔ *ψ*)⇔((*φ* ⟹ *ψ*)∧(*ψ* ⟹ *φ*))
 
 ```idris
-iff_to_and : (a <-> b) <-> (a -> b, b -> a)
-iff_to_and = (id, id)
+iffToAnd : (a <-> b) <-> (a -> b, b -> a)
+iffToAnd = Conj id id
 ```
 
