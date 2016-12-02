@@ -31,11 +31,11 @@ Negation
 `Not a`, written `~a`, is the negation of `a`.
 
 ```idris
-Not : Type -> Type
-Not a = a -> Void
+syntax "~" [x] = (Not x)
 ```
 ```idris
-syntax "~" [x] = (Not x)
+Not : Type -> Type
+Not a = a -> Void
 ```
 Conjunction
 -----------

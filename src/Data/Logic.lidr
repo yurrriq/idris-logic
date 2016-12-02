@@ -46,12 +46,12 @@ pandoc-minted:
 
 `Not a`, written `~a`, is the negation of `a`.
 
+> syntax "~" [x] = (Not x)
+
 ```idris
 Not : Type -> Type
 Not a = a -> Void
 ```
-
-> syntax "~" [x] = (Not x)
 
 == Conjunction
 
