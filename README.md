@@ -49,15 +49,18 @@ Conjunction
 ```idris
 syntax "(" [a] "," [b] ")" = (And a b)
 
+||| The conjunction of `a` and `b`.
 data And : Type -> Type -> Type where
      Conj : a -> b -> (a, b)
 
 implementation Bifunctor And where
     bimap f g (Conj a b) = Conj (f a) (g b)
 
+||| First projection of a conjunction.
 proj1 : (a, b) -> a
 proj1 (Conj a _) = a
 
+||| Second projection of a conjunction.
 proj2 : (a, b) -> b
 proj2 (Conj _ b) = b
 ```
@@ -81,6 +84,8 @@ Biconditional
 ```idris
 infixl 9 <->
 
+||| The biconditional is a *binary connective* that can be voiced:
+||| *p* **if and only if** *q*.
 public export
 (<->) : Type -> Type -> Type
 (<->) a b = (a -> b, b -> a)
@@ -92,6 +97,7 @@ public export
 ⊢*φ* ⇔ *φ*
 
 ```idris
+||| The biconditional operator is reflexive.
 iffRefl : a <-> a
 iffRefl = Conj id id
 ```
@@ -102,6 +108,7 @@ iffRefl = Conj id id
 <!-- \[ --> <!--   \begin{prooftree} --> <!--     \Hypo{ \varphi \iff \psi } --> <!--     \Hypo{ \psi \iff \chi } --> <!--     \Infer2 { \vdash \varphi \iff \chi } --> <!--   \end{prooftree} --> <!-- \] -->
 
 ```idris
+||| The biconditional operator is transitive.
 iffTrans : (a <-> b) -> (b <-> c) -> (a <-> c)
 iffTrans (Conj ab ba) (Conj bc cb) =
     Conj (bc . ab) (ba . cb)
@@ -117,6 +124,7 @@ or
 ⊢(*φ* ⇔ *ψ*)⇔(*ψ* ⇔ *φ*)
 
 ```idris
+||| The biconditional operator is commutative.
 iffSym : (a <-> b) -> (b <-> a)
 iffSym (Conj ab ba) = Conj ba ab
 ```
@@ -205,6 +213,7 @@ andCancelRight ba ca = Conj (bimap f g) andIffCompatRight
 #### Source
 
 ```idris
+||| Conjunction is commutative.
 andComm : (a, b) <-> (b, a)
 andComm = Conj swap swap
   where
@@ -226,6 +235,7 @@ andComm = Conj swap swap
 #### Source
 
 ```idris
+||| Conjunction is associative.
 andAssoc : ((a, b), c) <-> (a, (b, c))
 andAssoc = Conj f g
   where
@@ -269,6 +279,7 @@ orCancelRight bNotA cNotA = Conj (bimap f g) orIffCompatRight
 (*φ* ∨ *ψ*)⇔(*ψ* ∨ *φ*)
 
 ```idris
+||| Disjunction is commutative.
 orComm : Either a b <-> Either b a
 orComm = Conj mirror mirror
 ```
@@ -279,12 +290,14 @@ orComm = Conj mirror mirror
 (*φ* ∨ *ψ*)∨*χ* ⊢ *φ* ∨ (*ψ* ∨ *χ*)
 
 ```idris
+||| Disjunction is associative on the left.
 orAssocLeft : Either (Either a b) c -> Either a (Either b c)
 orAssocLeft = either (second Left) (pure . pure)
 ```
 *φ* ∨ (*ψ* ∨ *χ*)⊢(*φ* ∨ *ψ*)∨*χ*
 
 ```idris
+||| Disjunction is associative on the right.
 orAssocRight : Either a (Either b c) -> Either (Either a b) c
 orAssocRight = either (Left . Left) (first Right)
 ```
@@ -299,6 +312,7 @@ orAssocRight = either (Left . Left) (first Right)
 #### Source
 
 ```idris
+||| Disjunction is associative.
 orAssoc : Either (Either a b) c <-> Either a (Either b c)
 orAssoc = Conj orAssocLeft orAssocRight
 ```

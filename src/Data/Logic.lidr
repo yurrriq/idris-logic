@@ -63,15 +63,18 @@ Not a = a -> Void
 
 > syntax "(" [a] "," [b] ")" = (And a b)
 >
+> ||| The conjunction of `a` and `b`.
 > data And : Type -> Type -> Type where
 >      Conj : a -> b -> (a, b)
 >
 > implementation Bifunctor And where
 >     bimap f g (Conj a b) = Conj (f a) (g b)
 >
+> ||| First projection of a conjunction.
 > proj1 : (a, b) -> a
 > proj1 (Conj a _) = a
 >
+> ||| Second projection of a conjunction.
 > proj2 : (a, b) -> b
 > proj2 (Conj _ b) = b
 
@@ -95,6 +98,8 @@ data Either : Type -> Type -> Type where
 
 > infixl 9 <->
 >
+> ||| The biconditional is a *binary connective* that can be voiced:
+> ||| *p* **if and only if** *q*.
 > public export
 > (<->) : Type -> Type -> Type
 > (<->) a b = (a -> b, b -> a)
@@ -105,6 +110,7 @@ data Either : Type -> Type -> Type where
 
 $\vdash \varphi \iff \varphi$
 
+> ||| The biconditional operator is reflexive.
 > iffRefl : a <-> a
 > iffRefl = Conj id id
 
@@ -120,6 +126,7 @@ $\vdash \varphi \iff \varphi$
  <!--   \end{prooftree} -->
  <!-- \] -->
 
+> ||| The biconditional operator is transitive.
 > iffTrans : (a <-> b) -> (b <-> c) -> (a <-> c)
 > iffTrans (Conj ab ba) (Conj bc cb) =
 >     Conj (bc . ab) (ba . cb)
@@ -134,6 +141,7 @@ or
 
 $\vdash (\varphi \iff \psi) \iff (\psi \iff \varphi)$
 
+> ||| The biconditional operator is commutative.
 > iffSym : (a <-> b) -> (b <-> a)
 > iffSym (Conj ab ba) = Conj ba ab
 
@@ -214,6 +222,7 @@ $\vdash (\varphi \land \psi) \iff (\psi \land \varphi)$
 
 ==== Source
 
+> ||| Conjunction is commutative.
 > andComm : (a, b) <-> (b, a)
 > andComm = Conj swap swap
 >   where
@@ -232,6 +241,7 @@ $\vdash ((\varphi \land \psi) \land \chi) \iff (\varphi \land (\psi \land \chi))
 
 ==== Source
 
+> ||| Conjunction is associative.
 > andAssoc : ((a, b), c) <-> (a, (b, c))
 > andAssoc = Conj f g
 >   where
@@ -274,6 +284,7 @@ $(\psi \implies \neg \varphi) \implies (\chi \implies \neg \varphi) \implies (((
 
 $(\varphi \lor \psi) \iff (\psi \lor \varphi)$
 
+> ||| Disjunction is commutative.
 > orComm : Either a b <-> Either b a
 > orComm = Conj mirror mirror
 
@@ -283,11 +294,13 @@ $(\varphi \lor \psi) \iff (\psi \lor \varphi)$
 
 $(\varphi \lor \psi) \lor \chi \vdash \varphi \lor (\psi \lor \chi)$
 
+> ||| Disjunction is associative on the left.
 > orAssocLeft : Either (Either a b) c -> Either a (Either b c)
 > orAssocLeft = either (second Left) (pure . pure)
 
 $\varphi \lor (\psi \lor \chi) \vdash (\varphi \lor \psi) \lor \chi$
 
+> ||| Disjunction is associative on the right.
 > orAssocRight : Either a (Either b c) -> Either (Either a b) c
 > orAssocRight = either (Left . Left) (first Right)
 
@@ -299,6 +312,7 @@ $\vdash ((\varphi \lor \psi) \lor \chi) \iff (\varphi \lor (\psi \lor \chi))$
 
 ==== Source
 
+> ||| Disjunction is associative.
 > orAssoc : Either (Either a b) c <-> Either a (Either b c)
 > orAssoc = Conj orAssocLeft orAssocRight
 
