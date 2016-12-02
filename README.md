@@ -61,6 +61,16 @@ proj1 (Conj a _) = a
 proj2 : (a, b) -> b
 proj2 (Conj _ b) = b
 ```
+Disjunction
+-----------
+
+`Either a b` is the disjunction of `a` and `b`.
+
+```idris
+data Either : Type -> Type -> Type where
+     Left   : a -> Either a b
+     Right  : b -> Either a b     
+```
 Biconditional
 -------------
 
