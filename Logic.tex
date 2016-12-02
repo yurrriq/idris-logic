@@ -71,48 +71,47 @@ module from the Coq standard library.
 % \bibliography{sample}
 
 \begin{minted}[]{idris}
+||| An Idris port of Coq.Init.Logic
 module Logic
 
 import Data.Bifunctor
-
-%default total
 
 %access export
 \end{minted}
 
 \section{Propositional connectives}\label{propositional-connectives}
 
-\subsection{\texorpdfstring{\(\top\)}{\textbackslash{}top}}\label{top}
+\subsection{Unit}\label{unit}
 
-\mintinline[]{idris}{()} is the always true proposition.
+\mintinline[]{idris}{()} is the always true proposition (\(\top\)).
 
 \begin{minted}[]{idris}
 %elim data Unit = MkUnit
 \end{minted}
 
-\subsection{\texorpdfstring{\(\bot\)}{\textbackslash{}bot}}\label{bot}
+\subsection{Void}\label{void}
 
-\mintinline[]{idris}{Void} is the always false proposition.
+\mintinline[]{idris}{Void} is the always false proposition (\(\bot\)).
 
 \begin{minted}[]{idris}
 %elim data Void : Type where
 \end{minted}
 
-\subsection{\texorpdfstring{\(\neg\)}{\textbackslash{}neg}}\label{neg}
+\subsection{Negation}\label{negation}
 
 \mintinline[]{idris}{Not a}, written \mintinline[]{idris}{~a}, is the
 negation of \mintinline[]{idris}{a}.
+
+\begin{minted}[]{idris}
+syntax "~" [x] = (Not x)
+\end{minted}
 
 \begin{minted}[]{idris}
 Not : Type -> Type
 Not a = a -> Void
 \end{minted}
 
-\begin{minted}[]{idris}
-syntax "~" [x] = (Not x)
-\end{minted}
-
-\subsection{\texorpdfstring{\(\land\)}{\textbackslash{}land}}\label{land}
+\subsection{Conjunction}\label{conjunction}
 
 \mintinline[]{idris}{And a b}, written \mintinline[]{idris}{(a, b)}, is
 the conjunction of \mintinline[]{idris}{a} and \mintinline[]{idris}{b}.
@@ -128,20 +127,38 @@ and second projections of a conjunction.
 \begin{minted}[]{idris}
 syntax "(" [a] "," [b] ")" = (And a b)
 
+||| The conjunction of `a` and `b`.
 data And : Type -> Type -> Type where
      Conj : a -> b -> (a, b)
 
 implementation Bifunctor And where
     bimap f g (Conj a b) = Conj (f a) (g b)
 
+||| First projection of a conjunction.
 proj1 : (a, b) -> a
 proj1 (Conj a _) = a
 
+||| Second projection of a conjunction.
 proj2 : (a, b) -> b
 proj2 (Conj _ b) = b
 \end{minted}
 
+\subsection{Disjunction}\label{disjunction}
+
+\mintinline[]{idris}{Either a b} is the disjunction of
+\mintinline[]{idris}{a} and \mintinline[]{idris}{b}.
+
+\begin{minted}[]{idris}
+data Either : Type -> Type -> Type where
+     Left   : a -> Either a b
+     Right  : b -> Either a b     
+\end{minted}
+
+\newpage
+
 \subsection{Biconditional}\label{biconditional}
+
+\href{https://proofwiki.org/wiki/Definition:Biconditional}{Proof Wiki}
 
 \(\varphi \vdash \psi\)\\
 \(\underline{\psi \vdash \varphi}\)\\
@@ -154,6 +171,8 @@ expresses the equivalence of \mintinline[]{idris}{a} and
 \begin{minted}[]{idris}
 infixl 9 <->
 
+||| The biconditional is a *binary connective* that
+||| can be voiced: *p* **if and only if** *q*.
 public export
 (<->) : Type -> Type -> Type
 (<->) a b = (a -> b, b -> a)
@@ -167,6 +186,7 @@ Reflexive}\label{biconditional-is-reflexive}
 \(\vdash \varphi \iff \varphi\)
 
 \begin{minted}[]{idris}
+||| The biconditional operator is reflexive.
 iffRefl : a <-> a
 iffRefl = Conj id id
 \end{minted}
@@ -174,7 +194,8 @@ iffRefl = Conj id id
 \subsubsection{Biconditional is
 Transitive}\label{biconditional-is-transitive}
 
-\href{https://proofwiki.org/wiki/Biconditional_is_Transitive}{Proof Wiki}
+\href{https://proofwiki.org/wiki/Biconditional_is_Transitive}{Proof
+Wiki}
 
 \[
   \begin{prooftree}
@@ -185,6 +206,7 @@ Transitive}\label{biconditional-is-transitive}
 \]
 
 \begin{minted}[]{idris}
+||| The biconditional operator is transitive.
 iffTrans : (a <-> b) -> (b <-> c) -> (a <-> c)
 iffTrans (Conj ab ba) (Conj bc cb) =
     Conj (bc . ab) (ba . cb)
@@ -193,7 +215,8 @@ iffTrans (Conj ab ba) (Conj bc cb) =
 \subsubsection{Biconditional is
 Commutative}\label{biconditional-is-commutative}
 
-\href{https://proofwiki.org/wiki/Biconditional_is_Commutative}{Proof Wiki}
+\href{https://proofwiki.org/wiki/Biconditional_is_Commutative}{Proof
+Wiki}
 
 \(\varphi \iff \psi \dashv\vdash \psi \iff \varphi\)
 
@@ -202,6 +225,7 @@ or
 \(\vdash (\varphi \iff \psi) \iff (\psi \iff \varphi)\)
 
 \begin{minted}[]{idris}
+||| The biconditional operator is commutative.
 iffSym : (a <-> b) -> (b <-> a)
 iffSym (Conj ab ba) = Conj ba ab
 \end{minted}
@@ -234,6 +258,8 @@ orIffCompatLeft : (b <-> c) ->
 orIffCompatLeft = bimap second second
 \end{minted}
 
+\subsubsection{orIffCompatRight}\label{oriffcompatright}
+
 \(\psi \iff \chi \vdash (\psi \lor \varphi) \iff (\chi \lor \varphi)\)
 
 \begin{minted}[]{idris}
@@ -242,6 +268,8 @@ orIffCompatRight : (b <-> c) ->
 orIffCompatRight = bimap first first
 \end{minted}
 
+\subsubsection{negVoid}\label{negvoid}
+
 \(\neg \varphi \dashv\vdash \varphi \iff \bot\)
 
 or
@@ -249,9 +277,11 @@ or
 \(\vdash \neg \varphi \iff (\varphi \iff \bot)\)
 
 \begin{minted}[]{idris}
-negVoid : Not a <-> (a <-> Void)
+negVoid : (~a) <-> (a <-> Void)
 negVoid = Conj (flip Conj void) proj1
 \end{minted}
+
+\subsubsection{andCancelLeft}\label{andcancelleft}
 
 \(\psi \implies \varphi\)\\
 \(\underline{\chi \implies \varphi}\)\\
@@ -267,58 +297,7 @@ andCancelLeft ba ca = Conj (bimap f g) andIffCompatLeft
     g h c = proj2 . h $ Conj (ca c) c
 \end{minted}
 
-\[
-  \begin{prooftree}
-    \Hypo{ \vdash \implies \varphi, \psi }
-    \Infer1{ \vdash \psi \land \varphi }
-  \end{prooftree}
-\]
-
-\(\psi \implies \varphi\)\\
-\(\underline{\chi \implies \varphi \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad}\)\\
-\(((\psi \land \varphi) \iff (\chi \land \varphi)) \iff (\psi \iff \chi)\)
-
-\(\underline{\psi \land \varphi}\)\\
-\(\psi\)
-
-\(\psi \implies \varphi\)\\
-\(\underline{\psi\quad\quad}\)\\
-\(\psi \land \varphi\)
-
-\(\psi \land \varphi \vdash \psi\)\\
-\(\underline{\psi \implies \varphi, \psi \vdash \psi \land \varphi}\)\\
-\(\psi \iff (\psi \land \varphi)\)
-
-\(\underline{\chi \land \varphi}\)\\
-\(\chi\)
-
-\(\chi \implies \varphi\)\\
-\(\underline{\chi\quad\quad\quad}\)\\
-\(\chi \land \varphi\)
-
-\(\chi \land \varphi \vdash \chi\)\\
-\(\underline{\chi \implies \varphi, \chi \vdash \chi \land \varphi}\)\\
-\(\chi \iff (\chi \land \varphi)\)
-
-\(\psi \iff (\psi \land \varphi)\)\\
-\(\chi \iff (\chi \land \varphi)\)\\
-\(\underline{(\psi \land \varphi) \implies (\chi \land \varphi)}\)\\
-\(\psi \implies \chi\)
-
-\(\underline{\psi \land \varphi}\)\\
-\(\varphi \land \psi\)
-
-\(\underline{\chi \land \varphi}\)\\
-\(\chi \land \psi\)
-
-\(\psi \iff (\psi \land \varphi)\)\\
-\(\chi \iff (\chi \land \varphi)\)\\
-\(\underline{(\chi \land \varphi) \implies (\psi \land \varphi)}\)\\
-\(\chi \implies \psi\)
-
-\(\psi \implies \chi\)\\
-\(\underline{\chi \implies \psi}\)\\
-\(\psi \iff \chi\)
+\subsubsection{andCancelRight}\label{andcancelright}
 
 \begin{minted}[]{idris}
 andCancelRight : (b -> a) ->
@@ -326,26 +305,30 @@ andCancelRight : (b -> a) ->
                  (((b, a) <-> (c, a)) <-> (b <-> c))
 andCancelRight ba ca = Conj (bimap f g) andIffCompatRight
   where
-    f h b = ?rhs -- proj1 . h $ Conj b (ba b)
+    f h b = proj1 . h $ Conj b (ba b)
     g h c = proj1 . h $ Conj c (ca c)
 \end{minted}
+
+\newpage
 
 \subsubsection{Conjunction is
 Commutative}\label{conjunction-is-commutative}
 
-\href{https://proofwiki.org/wiki/Rule_of_Commutation/Conjunction}{Proof Wiki}
+\href{https://proofwiki.org/wiki/Rule_of_Commutation/Conjunction}{Proof
+Wiki}
 
 \paragraph{Formulation 1}\label{formulation-1}
 
-\(a \land b \dashv\vdash b \land a\)
+\(\varphi \land \psi \dashv\vdash \psi \land \varphi\)
 
-\paragraph{Formulation 1}\label{formulation-1-1}
+\paragraph{Formulation 2}\label{formulation-2}
 
-\(\vdash (a \land b) \iff (b \land a)\)
+\(\vdash (\varphi \land \psi) \iff (\psi \land \varphi)\)
 
 \paragraph{Source}\label{source}
 
 \begin{minted}[]{idris}
+||| Conjunction is commutative.
 andComm : (a, b) <-> (b, a)
 andComm = Conj swap swap
   where
@@ -356,40 +339,49 @@ andComm = Conj swap swap
 \subsubsection{Conjunction is
 Associative}\label{conjunction-is-associative}
 
-\href{https://proofwiki.org/wiki/Rule_of_Association/Conjunction}{Proof Wiki}
+\href{https://proofwiki.org/wiki/Rule_of_Association/Conjunction}{Proof
+Wiki}
 
-\paragraph{Formulation 1}\label{formulation-1-2}
+\paragraph{Formulation 1}\label{formulation-1-1}
 
-\((a \land b) \land c \dashv\vdash a \land (b \land c)\)
+\((\varphi \land \psi) \land \chi \dashv\vdash \varphi \land (\psi \land \chi)\)
 
-\paragraph{Formulation 2}\label{formulation-2}
+\paragraph{Formulation 2}\label{formulation-2-1}
 
-\(\vdash ((a \land b) \land c) \iff (a \land (b \land c))\)
+\(\vdash ((\varphi \land \psi) \land \chi) \iff (\varphi \land (\psi \land \chi))\)
 
 \paragraph{Source}\label{source-1}
 
 \begin{minted}[]{idris}
+||| Conjunction is associative.
 andAssoc : ((a, b), c) <-> (a, (b, c))
 andAssoc = Conj f g
   where
-    f abc@(Conj (Conj a b) c) = Conj a (first proj2 abc)
-    g abc@(Conj a (Conj b c)) = Conj (second proj1 abc) c
+    f abc@(Conj (Conj a b) c) =
+        Conj a (first proj2 abc)
+    g abc@(Conj a (Conj b c)) =
+        Conj (second proj1 abc) c
 \end{minted}
 
 \subsubsection{orCancelLeft}\label{orcancelleft}
 
-\((b \implies \neg a) \implies (c \implies \neg a) \implies (((a \lor b) \iff (a \lor c)) \iff (b \iff c))\)
+\((\psi \implies \neg \varphi) \implies (\chi \implies \neg \varphi) \implies (((\varphi \lor \psi) \iff (\varphi \lor \chi)) \iff (\psi \iff \chi))\)
 
 \begin{minted}[]{idris}
-orCancelLeft : (b -> Not a) -> (c -> Not a) ->
-               ((Either a b <-> Either a c) <-> (b <-> c))
-orCancelLeft bNotA cNotA = Conj (bimap f g) orIffCompatLeft
+orCancelLeft : (b -> ~a) ->
+               (c -> ~a) ->
+               ((Either a b <-> Either a c) <->
+                (b <-> c))
+orCancelLeft bNotA cNotA =
+    Conj (bimap f g) orIffCompatLeft
   where
     f ef b = go (bNotA b) (ef (Right b))
     g eg c = go (cNotA c) (eg (Right c))
-    go : Not a -> Either a b -> b
+    go : (~a) -> Either a b -> b
     go lf = either (void . lf) id
 \end{minted}
+
+\newpage
 
 \subsubsection{orCancelRight}\label{orcancelright}
 
@@ -398,57 +390,96 @@ orCancelLeft bNotA cNotA = Conj (bimap f g) orIffCompatLeft
 \(((\psi \lor \varphi) \iff (\chi \lor \varphi)) \iff (\psi \iff \chi)\)
 
 \begin{minted}[]{idris}
-or_cancel_r : (b -> Not a)
-           -> (c -> Not a)
-           -> ((Either b a <-> Either c a) <-> (b <-> c))
--- or_cancel_r bNotA cNotA = (bimap f g, or_iff_compat_r)
---   where
---     f ef b = go (bNotA b) (ef (Left b))
---     g eg c = go (cNotA c) (eg (Left c))
---     go : Not p -> Either q p -> q
---     go rf = either id (void . rf)
+orCancelRight : (b -> ~a) ->
+                (c -> ~a) ->
+                ((Either b a <-> Either c a) <->
+                 (b <-> c))
+orCancelRight bNotA cNotA =
+    Conj (bimap f g) orIffCompatRight
+  where
+    f ef b = go (bNotA b) (ef (Left b))
+    g eg c = go (cNotA c) (eg (Left c))
+    go : (~p) -> Either q p -> q
+    go rf = either id (void . rf)
 \end{minted}
 
-\((A \lor B) \iff (B \lor A)\)
+\subsubsection{Disjunction is
+Commutative}\label{disjunction-is-commutative}
+
+\href{https://proofwiki.org/wiki/Rule_of_Commutation/Disjunction}{Proof
+Wiki}
+
+\((\varphi \lor \psi) \iff (\psi \lor \varphi)\)
 
 \begin{minted}[]{idris}
-or_comm : Either a b <-> Either b a
--- or_comm = (mirror, mirror)
+||| Disjunction is commutative.
+orComm : Either a b <-> Either b a
+orComm = Conj mirror mirror
 \end{minted}
 
-\(((A \lor B) \lor C) \implies (A \lor (B \lor C))\)
+\subsubsection{Disjunction is
+Associative}\label{disjunction-is-associative}
+
+\href{https://proofwiki.org/wiki/Rule_of_Association/Disjunction}{Proof
+Wiki}
+
+\((\varphi \lor \psi) \lor \chi \vdash \varphi \lor (\psi \lor \chi)\)
 
 \begin{minted}[]{idris}
-or_assoc_lemma1 : Either (Either a b) c -> Either a (Either b c)
--- or_assoc_lemma1 = either (second Left) (pure . pure)
+||| Disjunction is associative on the left.
+orAssocLeft : Either (Either a b) c ->
+              Either a (Either b c)
+orAssocLeft = either (second Left) (pure . pure)
 \end{minted}
 
-\((A \lor (B \lor C)) \implies ((A \lor B) \lor C)\)
+\(\varphi \lor (\psi \lor \chi) \vdash (\varphi \lor \psi) \lor \chi\)
 
 \begin{minted}[]{idris}
-or_assoc_lemma2 : Either a (Either b c) -> Either (Either a b) c
--- or_assoc_lemma2 = either (Left . Left) (first Right)
+||| Disjunction is associative on the right.
+orAssocRight : Either a (Either b c) ->
+               Either (Either a b) c
+orAssocRight = either (Left . Left) (first Right)
 \end{minted}
 
-\(((A \lor B) \lor C) \iff (A \lor (B \lor C))\)
+\paragraph{Formulation 1}\label{formulation-1-2}
+
+\((\varphi \lor \psi) \lor \chi \dashv\vdash \varphi \lor (\psi \lor \chi)\)
+
+\paragraph{Formulation 2}\label{formulation-2-2}
+
+\(\vdash ((\varphi \lor \psi) \lor \chi) \iff (\varphi \lor (\psi \lor \chi))\)
+
+\paragraph{Source}\label{source-2}
 
 \begin{minted}[]{idris}
-or_assoc : Either (Either a b) c <-> Either a (Either b c)
--- or_assoc = (or_assoc_lemma1, or_assoc_lemma2)
+||| Disjunction is associative.
+orAssoc : Either (Either a b) c <->
+          Either a (Either b c)
+orAssoc = Conj orAssocLeft orAssocRight
 \end{minted}
 
-\((A \iff B) \implies ((A \implies B) \land (B \implies A))\)
+\newpage
+
+\subsubsection{iffAnd}\label{iffand}
+
+\(\varphi \iff \psi \vdash (\varphi \implies \psi) \land (\psi \implies \varphi)\)
 
 \begin{minted}[]{idris}
-iff_and : (a <-> b) -> (a -> b, b -> a)
--- iff_and = id
+iffAnd : (a <-> b) -> (a -> b, b -> a)
+iffAnd = id
 \end{minted}
 
-\((A \iff B) \iff ((A \implies B) \land (B \implies A))\)
+\subsubsection{iffAndTo}\label{iffandto}
+
+\(\varphi \iff \psi \dashv\vdash (\varphi \implies \psi) \land (\psi \implies \varphi)\)
+
+or
+
+\(\vdash (\varphi \iff \psi) \iff ((\varphi \implies \psi) \land (\psi \implies \varphi))\)
 
 \begin{minted}[]{idris}
-iff_to_and : (a <-> b) <-> (a -> b, b -> a)
--- iff_to_and = (id, id)
+iffToAnd : (a <-> b) <-> (a -> b, b -> a)
+iffToAnd = Conj id id
 \end{minted}
 
 \balancecolumns

@@ -88,6 +88,8 @@ data Either : Type -> Type -> Type where
      Right  : b -> Either a b     
 ```
 
+\newpage
+
 == Biconditional
 
 [Proof Wiki](https://proofwiki.org/wiki/Definition:Biconditional)
@@ -100,8 +102,8 @@ $\varphi \iff \psi$
 
 > infixl 9 <->
 >
-> ||| The biconditional is a *binary connective* that can be voiced:
-> ||| *p* **if and only if** *q*.
+> ||| The biconditional is a *binary connective* that
+> ||| can be voiced: *p* **if and only if** *q*.
 > public export
 > (<->) : Type -> Type -> Type
 > (<->) a b = (a -> b, b -> a)
@@ -212,6 +214,8 @@ $((\varphi \land \psi) \iff (\varphi \land \chi)) \iff (\psi \iff \chi)$
 >     f h b = proj1 . h $ Conj b (ba b)
 >     g h c = proj1 . h $ Conj c (ca c)
 
+\newpage
+
 === Conjunction is Commutative
 
 [Proof Wiki](https://proofwiki.org/wiki/Rule_of_Commutation/Conjunction)
@@ -247,8 +251,10 @@ $\vdash ((\varphi \land \psi) \land \chi) \iff (\varphi \land (\psi \land \chi))
 > andAssoc : ((a, b), c) <-> (a, (b, c))
 > andAssoc = Conj f g
 >   where
->     f abc@(Conj (Conj a b) c) = Conj a (first proj2 abc)
->     g abc@(Conj a (Conj b c)) = Conj (second proj1 abc) c
+>     f abc@(Conj (Conj a b) c) =
+>         Conj a (first proj2 abc)
+>     g abc@(Conj a (Conj b c)) =
+>         Conj (second proj1 abc) c
 
 === orCancelLeft
 
@@ -256,13 +262,17 @@ $(\psi \implies \neg \varphi) \implies (\chi \implies \neg \varphi) \implies (((
 
 > orCancelLeft : (b -> ~a) ->
 >                (c -> ~a) ->
->                ((Either a b <-> Either a c) <-> (b <-> c))
-> orCancelLeft bNotA cNotA = Conj (bimap f g) orIffCompatLeft
+>                ((Either a b <-> Either a c) <->
+>                 (b <-> c))
+> orCancelLeft bNotA cNotA =
+>     Conj (bimap f g) orIffCompatLeft
 >   where
 >     f ef b = go (bNotA b) (ef (Right b))
 >     g eg c = go (cNotA c) (eg (Right c))
 >     go : (~a) -> Either a b -> b
 >     go lf = either (void . lf) id
+
+\newpage
 
 === orCancelRight
 
@@ -272,8 +282,10 @@ $((\psi \lor \varphi) \iff (\chi \lor \varphi)) \iff (\psi \iff \chi)$
 
 > orCancelRight : (b -> ~a) ->
 >                 (c -> ~a) ->
->                 ((Either b a <-> Either c a) <-> (b <-> c))
-> orCancelRight bNotA cNotA = Conj (bimap f g) orIffCompatRight
+>                 ((Either b a <-> Either c a) <->
+>                  (b <-> c))
+> orCancelRight bNotA cNotA =
+>     Conj (bimap f g) orIffCompatRight
 >   where
 >     f ef b = go (bNotA b) (ef (Left b))
 >     g eg c = go (cNotA c) (eg (Left c))
@@ -297,13 +309,15 @@ $(\varphi \lor \psi) \iff (\psi \lor \varphi)$
 $(\varphi \lor \psi) \lor \chi \vdash \varphi \lor (\psi \lor \chi)$
 
 > ||| Disjunction is associative on the left.
-> orAssocLeft : Either (Either a b) c -> Either a (Either b c)
+> orAssocLeft : Either (Either a b) c ->
+>               Either a (Either b c)
 > orAssocLeft = either (second Left) (pure . pure)
 
 $\varphi \lor (\psi \lor \chi) \vdash (\varphi \lor \psi) \lor \chi$
 
 > ||| Disjunction is associative on the right.
-> orAssocRight : Either a (Either b c) -> Either (Either a b) c
+> orAssocRight : Either a (Either b c) ->
+>                Either (Either a b) c
 > orAssocRight = either (Left . Left) (first Right)
 
 ==== Formulation 1
@@ -315,8 +329,11 @@ $\vdash ((\varphi \lor \psi) \lor \chi) \iff (\varphi \lor (\psi \lor \chi))$
 ==== Source
 
 > ||| Disjunction is associative.
-> orAssoc : Either (Either a b) c <-> Either a (Either b c)
+> orAssoc : Either (Either a b) c <->
+>           Either a (Either b c)
 > orAssoc = Conj orAssocLeft orAssocRight
+
+\newpage
 
 === iffAnd
 
