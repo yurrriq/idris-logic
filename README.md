@@ -77,6 +77,8 @@ data Either : Type -> Type -> Type where
 Biconditional
 -------------
 
+[Proof Wiki](https://proofwiki.org/wiki/Definition:Biconditional)
+
 <!-- $\varphi \vdash \psi$\ --> <!-- $\underline{\psi \vdash \varphi}$\ --> <!-- $\varphi \iff \psi$ -->
 
 `iff a b`, written `a <-> b`, expresses the equivalence of `a` and `b`.

@@ -90,6 +90,8 @@ data Either : Type -> Type -> Type where
 
 == Biconditional
 
+[Proof Wiki](https://proofwiki.org/wiki/Definition:Biconditional)
+
  <!-- $\varphi \vdash \psi$\ -->
  <!-- $\underline{\psi \vdash \varphi}$\ -->
  <!-- $\varphi \iff \psi$ -->
