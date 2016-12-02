@@ -237,7 +237,8 @@ andAssoc = Conj f g
 (*ψ* ⟹ ¬*φ*)⟹(*χ* ⟹ ¬*φ*)⟹(((*φ* ∨ *ψ*)⇔(*φ* ∨ *χ*)) ⇔ (*ψ* ⇔ *χ*))
 
 ```idris
-orCancelLeft : (b -> ~a) -> (c -> ~a) ->
+orCancelLeft : (b -> ~a) ->
+               (c -> ~a) ->
                ((Either a b <-> Either a c) <-> (b <-> c))
 orCancelLeft bNotA cNotA = Conj (bimap f g) orIffCompatLeft
   where
@@ -251,9 +252,9 @@ orCancelLeft bNotA cNotA = Conj (bimap f g) orIffCompatLeft
 <!-- $\psi \vdash \neg \varphi$\ --> <!-- $\underline{\chi \vdash \neg \varphi}$\ --> <!-- $((\psi \lor \varphi) \iff (\chi \lor \varphi)) \iff (\psi \iff \chi)$ -->
 
 ```idris
-orCancelRight : (b -> ~a)
-           -> (c -> ~a)
-           -> ((Either b a <-> Either c a) <-> (b <-> c))
+orCancelRight : (b -> ~a) ->
+                (c -> ~a) ->
+                ((Either b a <-> Either c a) <-> (b <-> c))
 orCancelRight bNotA cNotA = Conj (bimap f g) orIffCompatRight
   where
     f ef b = go (bNotA b) (ef (Left b))

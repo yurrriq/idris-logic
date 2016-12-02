@@ -242,7 +242,8 @@ $\vdash ((\varphi \land \psi) \land \chi) \iff (\varphi \land (\psi \land \chi))
 
 $(\psi \implies \neg \varphi) \implies (\chi \implies \neg \varphi) \implies (((\varphi \lor \psi) \iff (\varphi \lor \chi)) \iff (\psi \iff \chi))$
 
-> orCancelLeft : (b -> ~a) -> (c -> ~a) ->
+> orCancelLeft : (b -> ~a) ->
+>                (c -> ~a) ->
 >                ((Either a b <-> Either a c) <-> (b <-> c))
 > orCancelLeft bNotA cNotA = Conj (bimap f g) orIffCompatLeft
 >   where
@@ -257,9 +258,9 @@ $(\psi \implies \neg \varphi) \implies (\chi \implies \neg \varphi) \implies (((
  <!-- $\underline{\chi \vdash \neg \varphi}$\ -->
  <!-- $((\psi \lor \varphi) \iff (\chi \lor \varphi)) \iff (\psi \iff \chi)$ -->
 
-> orCancelRight : (b -> ~a)
->            -> (c -> ~a)
->            -> ((Either b a <-> Either c a) <-> (b <-> c))
+> orCancelRight : (b -> ~a) ->
+>                 (c -> ~a) ->
+>                 ((Either b a <-> Either c a) <-> (b <-> c))
 > orCancelRight bNotA cNotA = Conj (bimap f g) orIffCompatRight
 >   where
 >     f ef b = go (bNotA b) (ef (Left b))
