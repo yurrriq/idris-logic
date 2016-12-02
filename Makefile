@@ -50,3 +50,11 @@ README.md: src/Data/Logic.lidr src/pandoc-minted.py
 	-f markdown+lhs+tex_math_single_backslash \
 	-t markdown_github \
 	-o $@ $<
+
+Logic.pdf: Logic.tex
+	pdflatex -shell-escape -interaction nonstopmode -synctex=1 $<
+
+Logic.tex: src/Data/Logic.lidr template.tex
+	pandoc --filter src/pandoc-minted.py \
+	-f markdown+lhs+tex_math_single_backslash \
+	-t latex --template template.tex -o $@ $<

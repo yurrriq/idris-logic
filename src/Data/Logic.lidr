@@ -92,9 +92,9 @@ data Either : Type -> Type -> Type where
 
 [Proof Wiki](https://proofwiki.org/wiki/Definition:Biconditional)
 
- <!-- $\varphi \vdash \psi$\ -->
- <!-- $\underline{\psi \vdash \varphi}$\ -->
- <!-- $\varphi \iff \psi$ -->
+$\varphi \vdash \psi$\
+$\underline{\psi \vdash \varphi}$\
+$\varphi \iff \psi$
 
 `iff a b`, written `a <-> b`, expresses the equivalence of `a` and `b`.
 
@@ -120,13 +120,13 @@ $\vdash \varphi \iff \varphi$
 
 [Proof Wiki](https://proofwiki.org/wiki/Biconditional_is_Transitive)
 
- <!-- \[ -->
- <!--   \begin{prooftree} -->
- <!--     \Hypo{ \varphi \iff \psi } -->
- <!--     \Hypo{ \psi \iff \chi } -->
- <!--     \Infer2 { \vdash \varphi \iff \chi } -->
- <!--   \end{prooftree} -->
- <!-- \] -->
+\[
+  \begin{prooftree}
+    \Hypo{ \varphi \iff \psi }
+    \Hypo{ \psi \iff \chi }
+    \Infer2 { \vdash \varphi \iff \chi }
+  \end{prooftree}
+\]
 
 > ||| The biconditional operator is transitive.
 > iffTrans : (a <-> b) -> (b <-> c) -> (a <-> c)
@@ -190,9 +190,9 @@ $\vdash \neg \varphi \iff (\varphi \iff \bot)$
 
 === andCancelLeft
 
- <!-- $\psi \implies \varphi$\ -->
- <!-- $\underline{\chi \implies \varphi}$\ -->
- <!-- $((\varphi \land \psi) \iff (\varphi \land \chi)) \iff (\psi \iff \chi)$ -->
+$\psi \implies \varphi$\
+$\underline{\chi \implies \varphi}$\
+$((\varphi \land \psi) \iff (\varphi \land \chi)) \iff (\psi \iff \chi)$
 
 > andCancelLeft : (b -> a) ->
 >                 (c -> a) ->
@@ -266,9 +266,9 @@ $(\psi \implies \neg \varphi) \implies (\chi \implies \neg \varphi) \implies (((
 
 === orCancelRight
 
- <!-- $\psi \vdash \neg \varphi$\ -->
- <!-- $\underline{\chi \vdash \neg \varphi}$\ -->
- <!-- $((\psi \lor \varphi) \iff (\chi \lor \varphi)) \iff (\psi \iff \chi)$ -->
+$\psi \vdash \neg \varphi$\
+$\underline{\chi \vdash \neg \varphi}$\
+$((\psi \lor \varphi) \iff (\chi \lor \varphi)) \iff (\psi \iff \chi)$
 
 > orCancelRight : (b -> ~a) ->
 >                 (c -> ~a) ->

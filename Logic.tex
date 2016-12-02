@@ -1,0 +1,456 @@
+\documentclass{acm_proc_article-sp}
+
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{minted}
+\usepackage{ebproof}
+
+\hypersetup{unicode=true,
+            pdftitle={Logic: An Idris port of Coq.Init.Logic},
+            pdfauthor={Eric Bailey},
+            pdfkeywords={logic; coq; idris},
+            pdfborder={0 0 0},
+            breaklinks=true}
+
+
+\renewcommand{\iff}{\leftrightarrow}
+\renewcommand{\implies}{\rightarrow}
+
+\begin{document}
+
+\title{Logic}
+\subtitle{An Idris port of Coq.Init.Logic}
+
+\numberofauthors{1}
+\author{
+    \alignauthor \affaddr{Eric Bailey}\\
+\affaddr{https://github.com/yurrriq}\\
+\email{eric@ericb.me}
+  }
+
+\date{}
+
+
+\maketitle
+\begin{abstract}
+Here I present an Idris port of the
+\href{https://coq.inria.fr/library/Coq.Init.Logic.html}{\mintinline[]{idris}{Coq.Init.Logic}}
+module from the Coq standard library.
+\end{abstract}
+
+% % A category with the (minimum) three required fields
+% \category{H.4}{Information Systems Applications}{Miscellaneous}
+% %A category including the fourth, optional field follows...
+% \category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
+
+% \terms{Theory}
+
+\keywords{logic, coq, idris} % NOT required for Proceedings
+
+% \section{Introduction}
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+
+% Citation of Einstein paper~\cite{Einstein}.
+
+% \section{Results and Discussions}
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% \bibliographystyle{abbrv}
+% \bibliography{sample}
+
+\begin{minted}[]{idris}
+module Logic
+
+import Data.Bifunctor
+
+%default total
+
+%access export
+\end{minted}
+
+\section{Propositional connectives}\label{propositional-connectives}
+
+\subsection{\texorpdfstring{\(\top\)}{\textbackslash{}top}}\label{top}
+
+\mintinline[]{idris}{()} is the always true proposition.
+
+\begin{minted}[]{idris}
+%elim data Unit = MkUnit
+\end{minted}
+
+\subsection{\texorpdfstring{\(\bot\)}{\textbackslash{}bot}}\label{bot}
+
+\mintinline[]{idris}{Void} is the always false proposition.
+
+\begin{minted}[]{idris}
+%elim data Void : Type where
+\end{minted}
+
+\subsection{\texorpdfstring{\(\neg\)}{\textbackslash{}neg}}\label{neg}
+
+\mintinline[]{idris}{Not a}, written \mintinline[]{idris}{~a}, is the
+negation of \mintinline[]{idris}{a}.
+
+\begin{minted}[]{idris}
+Not : Type -> Type
+Not a = a -> Void
+\end{minted}
+
+\begin{minted}[]{idris}
+syntax "~" [x] = (Not x)
+\end{minted}
+
+\subsection{\texorpdfstring{\(\land\)}{\textbackslash{}land}}\label{land}
+
+\mintinline[]{idris}{And a b}, written \mintinline[]{idris}{(a, b)}, is
+the conjunction of \mintinline[]{idris}{a} and \mintinline[]{idris}{b}.
+
+\mintinline[]{idris}{Conj p q} is a proof of
+\mintinline[]{idris}{(a, b)} as soon as \mintinline[]{idris}{p} is a
+proof of \mintinline[]{idris}{a} and \mintinline[]{idris}{q} a proof of
+\mintinline[]{idris}{b}.
+
+\mintinline[]{idris}{proj1} and \mintinline[]{idris}{proj2} are first
+and second projections of a conjunction.
+
+\begin{minted}[]{idris}
+syntax "(" [a] "," [b] ")" = (And a b)
+
+data And : Type -> Type -> Type where
+     Conj : a -> b -> (a, b)
+
+implementation Bifunctor And where
+    bimap f g (Conj a b) = Conj (f a) (g b)
+
+proj1 : (a, b) -> a
+proj1 (Conj a _) = a
+
+proj2 : (a, b) -> b
+proj2 (Conj _ b) = b
+\end{minted}
+
+\subsection{Biconditional}\label{biconditional}
+
+\(\varphi \vdash \psi\)\\
+\(\underline{\psi \vdash \varphi}\)\\
+\(\varphi \iff \psi\)
+
+\mintinline[]{idris}{iff a b}, written \mintinline[]{idris}{a <-> b},
+expresses the equivalence of \mintinline[]{idris}{a} and
+\mintinline[]{idris}{b}.
+
+\begin{minted}[]{idris}
+infixl 9 <->
+
+public export
+(<->) : Type -> Type -> Type
+(<->) a b = (a -> b, b -> a)
+\end{minted}
+
+\subsubsection{Biconditional is
+Reflexive}\label{biconditional-is-reflexive}
+
+\href{https://proofwiki.org/wiki/Biconditional_is_Reflexive}{Proof Wiki}
+
+\(\vdash \varphi \iff \varphi\)
+
+\begin{minted}[]{idris}
+iffRefl : a <-> a
+iffRefl = Conj id id
+\end{minted}
+
+\subsubsection{Biconditional is
+Transitive}\label{biconditional-is-transitive}
+
+\href{https://proofwiki.org/wiki/Biconditional_is_Transitive}{Proof Wiki}
+
+\[
+  \begin{prooftree}
+    \Hypo{ \varphi \iff \psi }
+    \Hypo{ \psi \iff \chi }
+    \Infer2 { \vdash \varphi \iff \chi }
+  \end{prooftree}
+\]
+
+\begin{minted}[]{idris}
+iffTrans : (a <-> b) -> (b <-> c) -> (a <-> c)
+iffTrans (Conj ab ba) (Conj bc cb) =
+    Conj (bc . ab) (ba . cb)
+\end{minted}
+
+\subsubsection{Biconditional is
+Commutative}\label{biconditional-is-commutative}
+
+\href{https://proofwiki.org/wiki/Biconditional_is_Commutative}{Proof Wiki}
+
+\(\varphi \iff \psi \dashv\vdash \psi \iff \varphi\)
+
+or
+
+\(\vdash (\varphi \iff \psi) \iff (\psi \iff \varphi)\)
+
+\begin{minted}[]{idris}
+iffSym : (a <-> b) -> (b <-> a)
+iffSym (Conj ab ba) = Conj ba ab
+\end{minted}
+
+\subsubsection{andIffCompatLeft}\label{andiffcompatleft}
+
+\(\psi \iff \chi \dashv\vdash (\varphi \land \psi) \iff (\varphi \land \chi)\)
+
+\begin{minted}[]{idris}
+andIffCompatLeft : (b <-> c) -> ((a, b) <-> (a, c))
+andIffCompatLeft = bimap second second
+\end{minted}
+
+\subsubsection{andIffCompatRight}\label{andiffcompatright}
+
+\(\psi \iff \chi \dashv\vdash (\psi \land \varphi) \iff (\chi \land \varphi)\)
+
+\begin{minted}[]{idris}
+andIffCompatRight : (b <-> c) -> ((b, a) <-> (c, a))
+andIffCompatRight = bimap first first
+\end{minted}
+
+\subsubsection{orIffCompatLeft}\label{oriffcompatleft}
+
+\(\psi \iff \chi \vdash (\varphi \lor \psi) \iff (\varphi \lor \chi)\)
+
+\begin{minted}[]{idris}
+orIffCompatLeft : (b <-> c) ->
+                  (Either a b <-> Either a c)
+orIffCompatLeft = bimap second second
+\end{minted}
+
+\(\psi \iff \chi \vdash (\psi \lor \varphi) \iff (\chi \lor \varphi)\)
+
+\begin{minted}[]{idris}
+orIffCompatRight : (b <-> c) ->
+                   (Either b a <-> Either c a)
+orIffCompatRight = bimap first first
+\end{minted}
+
+\(\neg \varphi \dashv\vdash \varphi \iff \bot\)
+
+or
+
+\(\vdash \neg \varphi \iff (\varphi \iff \bot)\)
+
+\begin{minted}[]{idris}
+negVoid : Not a <-> (a <-> Void)
+negVoid = Conj (flip Conj void) proj1
+\end{minted}
+
+\(\psi \implies \varphi\)\\
+\(\underline{\chi \implies \varphi}\)\\
+\(((\varphi \land \psi) \iff (\varphi \land \chi)) \iff (\psi \iff \chi)\)
+
+\begin{minted}[]{idris}
+andCancelLeft : (b -> a) ->
+                (c -> a) ->
+                (((a, b) <-> (a, c)) <-> (b <-> c))
+andCancelLeft ba ca = Conj (bimap f g) andIffCompatLeft
+  where
+    f h b = proj2 . h $ Conj (ba b) b
+    g h c = proj2 . h $ Conj (ca c) c
+\end{minted}
+
+\[
+  \begin{prooftree}
+    \Hypo{ \vdash \implies \varphi, \psi }
+    \Infer1{ \vdash \psi \land \varphi }
+  \end{prooftree}
+\]
+
+\(\psi \implies \varphi\)\\
+\(\underline{\chi \implies \varphi \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad}\)\\
+\(((\psi \land \varphi) \iff (\chi \land \varphi)) \iff (\psi \iff \chi)\)
+
+\(\underline{\psi \land \varphi}\)\\
+\(\psi\)
+
+\(\psi \implies \varphi\)\\
+\(\underline{\psi\quad\quad}\)\\
+\(\psi \land \varphi\)
+
+\(\psi \land \varphi \vdash \psi\)\\
+\(\underline{\psi \implies \varphi, \psi \vdash \psi \land \varphi}\)\\
+\(\psi \iff (\psi \land \varphi)\)
+
+\(\underline{\chi \land \varphi}\)\\
+\(\chi\)
+
+\(\chi \implies \varphi\)\\
+\(\underline{\chi\quad\quad\quad}\)\\
+\(\chi \land \varphi\)
+
+\(\chi \land \varphi \vdash \chi\)\\
+\(\underline{\chi \implies \varphi, \chi \vdash \chi \land \varphi}\)\\
+\(\chi \iff (\chi \land \varphi)\)
+
+\(\psi \iff (\psi \land \varphi)\)\\
+\(\chi \iff (\chi \land \varphi)\)\\
+\(\underline{(\psi \land \varphi) \implies (\chi \land \varphi)}\)\\
+\(\psi \implies \chi\)
+
+\(\underline{\psi \land \varphi}\)\\
+\(\varphi \land \psi\)
+
+\(\underline{\chi \land \varphi}\)\\
+\(\chi \land \psi\)
+
+\(\psi \iff (\psi \land \varphi)\)\\
+\(\chi \iff (\chi \land \varphi)\)\\
+\(\underline{(\chi \land \varphi) \implies (\psi \land \varphi)}\)\\
+\(\chi \implies \psi\)
+
+\(\psi \implies \chi\)\\
+\(\underline{\chi \implies \psi}\)\\
+\(\psi \iff \chi\)
+
+\begin{minted}[]{idris}
+andCancelRight : (b -> a) ->
+                 (c -> a) ->
+                 (((b, a) <-> (c, a)) <-> (b <-> c))
+andCancelRight ba ca = Conj (bimap f g) andIffCompatRight
+  where
+    f h b = ?rhs -- proj1 . h $ Conj b (ba b)
+    g h c = proj1 . h $ Conj c (ca c)
+\end{minted}
+
+\subsubsection{Conjunction is
+Commutative}\label{conjunction-is-commutative}
+
+\href{https://proofwiki.org/wiki/Rule_of_Commutation/Conjunction}{Proof Wiki}
+
+\paragraph{Formulation 1}\label{formulation-1}
+
+\(a \land b \dashv\vdash b \land a\)
+
+\paragraph{Formulation 1}\label{formulation-1-1}
+
+\(\vdash (a \land b) \iff (b \land a)\)
+
+\paragraph{Source}\label{source}
+
+\begin{minted}[]{idris}
+andComm : (a, b) <-> (b, a)
+andComm = Conj swap swap
+  where
+    swap : (p, q) -> (q, p)
+    swap (Conj p q) = Conj q p
+\end{minted}
+
+\subsubsection{Conjunction is
+Associative}\label{conjunction-is-associative}
+
+\href{https://proofwiki.org/wiki/Rule_of_Association/Conjunction}{Proof Wiki}
+
+\paragraph{Formulation 1}\label{formulation-1-2}
+
+\((a \land b) \land c \dashv\vdash a \land (b \land c)\)
+
+\paragraph{Formulation 2}\label{formulation-2}
+
+\(\vdash ((a \land b) \land c) \iff (a \land (b \land c))\)
+
+\paragraph{Source}\label{source-1}
+
+\begin{minted}[]{idris}
+andAssoc : ((a, b), c) <-> (a, (b, c))
+andAssoc = Conj f g
+  where
+    f abc@(Conj (Conj a b) c) = Conj a (first proj2 abc)
+    g abc@(Conj a (Conj b c)) = Conj (second proj1 abc) c
+\end{minted}
+
+\subsubsection{orCancelLeft}\label{orcancelleft}
+
+\((b \implies \neg a) \implies (c \implies \neg a) \implies (((a \lor b) \iff (a \lor c)) \iff (b \iff c))\)
+
+\begin{minted}[]{idris}
+orCancelLeft : (b -> Not a) -> (c -> Not a) ->
+               ((Either a b <-> Either a c) <-> (b <-> c))
+orCancelLeft bNotA cNotA = Conj (bimap f g) orIffCompatLeft
+  where
+    f ef b = go (bNotA b) (ef (Right b))
+    g eg c = go (cNotA c) (eg (Right c))
+    go : Not a -> Either a b -> b
+    go lf = either (void . lf) id
+\end{minted}
+
+\subsubsection{orCancelRight}\label{orcancelright}
+
+\(\psi \vdash \neg \varphi\)\\
+\(\underline{\chi \vdash \neg \varphi}\)\\
+\(((\psi \lor \varphi) \iff (\chi \lor \varphi)) \iff (\psi \iff \chi)\)
+
+\begin{minted}[]{idris}
+or_cancel_r : (b -> Not a)
+           -> (c -> Not a)
+           -> ((Either b a <-> Either c a) <-> (b <-> c))
+-- or_cancel_r bNotA cNotA = (bimap f g, or_iff_compat_r)
+--   where
+--     f ef b = go (bNotA b) (ef (Left b))
+--     g eg c = go (cNotA c) (eg (Left c))
+--     go : Not p -> Either q p -> q
+--     go rf = either id (void . rf)
+\end{minted}
+
+\((A \lor B) \iff (B \lor A)\)
+
+\begin{minted}[]{idris}
+or_comm : Either a b <-> Either b a
+-- or_comm = (mirror, mirror)
+\end{minted}
+
+\(((A \lor B) \lor C) \implies (A \lor (B \lor C))\)
+
+\begin{minted}[]{idris}
+or_assoc_lemma1 : Either (Either a b) c -> Either a (Either b c)
+-- or_assoc_lemma1 = either (second Left) (pure . pure)
+\end{minted}
+
+\((A \lor (B \lor C)) \implies ((A \lor B) \lor C)\)
+
+\begin{minted}[]{idris}
+or_assoc_lemma2 : Either a (Either b c) -> Either (Either a b) c
+-- or_assoc_lemma2 = either (Left . Left) (first Right)
+\end{minted}
+
+\(((A \lor B) \lor C) \iff (A \lor (B \lor C))\)
+
+\begin{minted}[]{idris}
+or_assoc : Either (Either a b) c <-> Either a (Either b c)
+-- or_assoc = (or_assoc_lemma1, or_assoc_lemma2)
+\end{minted}
+
+\((A \iff B) \implies ((A \implies B) \land (B \implies A))\)
+
+\begin{minted}[]{idris}
+iff_and : (a <-> b) -> (a -> b, b -> a)
+-- iff_and = id
+\end{minted}
+
+\((A \iff B) \iff ((A \implies B) \land (B \implies A))\)
+
+\begin{minted}[]{idris}
+iff_to_and : (a <-> b) <-> (a -> b, b -> a)
+-- iff_to_and = (id, id)
+\end{minted}
+
+\balancecolumns
+
+\end{document}

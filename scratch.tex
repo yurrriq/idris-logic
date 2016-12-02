@@ -1,0 +1,58 @@
+
+\[
+  \begin{prooftree}
+    \Hypo{ \vdash \implies \varphi, \psi }
+    \Infer1{ \vdash \psi \land \varphi }
+  \end{prooftree}
+\]
+
+$\psi \implies \varphi$\
+$\underline{\chi \implies \varphi \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad}$\
+$((\psi \land \varphi) \iff (\chi \land \varphi)) \iff (\psi \iff \chi)$
+
+
+$\underline{\psi \land \varphi}$\
+$\psi$
+
+$\psi \implies \varphi$\
+$\underline{\psi\quad\quad}$\
+$\psi \land \varphi$
+
+$\psi \land \varphi \vdash \psi$\
+$\underline{\psi \implies \varphi, \psi \vdash \psi \land \varphi}$\
+$\psi \iff (\psi \land \varphi)$
+
+
+$\underline{\chi \land \varphi}$\
+$\chi$
+
+$\chi \implies \varphi$\
+$\underline{\chi\quad\quad\quad}$\
+$\chi \land \varphi$
+
+$\chi \land \varphi \vdash \chi$\
+$\underline{\chi \implies \varphi, \chi \vdash \chi \land \varphi}$\
+$\chi \iff (\chi \land \varphi)$
+
+
+$\psi \iff (\psi \land \varphi)$\
+$\chi \iff (\chi \land \varphi)$\
+$\underline{(\psi \land \varphi) \implies (\chi \land \varphi)}$\
+$\psi \implies \chi$
+
+
+$\underline{\psi \land \varphi}$\
+$\varphi \land \psi$
+
+$\underline{\chi \land \varphi}$\
+$\chi \land \psi$
+
+$\psi \iff (\psi \land \varphi)$\
+$\chi \iff (\chi \land \varphi)$\
+$\underline{(\chi \land \varphi) \implies (\psi \land \varphi)}$\
+$\chi \implies \psi$
+
+
+$\psi \implies \chi$\
+$\underline{\chi \implies \psi}$\
+$\psi \iff \chi$

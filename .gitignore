@@ -21,3 +21,8 @@ cabal.project.local
 *.ibc
 *~
 deps/
+
+_minted*/
+*.log
+*.out
+*.synctex.gz

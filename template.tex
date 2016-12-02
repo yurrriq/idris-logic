@@ -1,0 +1,100 @@
+\documentclass{acm_proc_article-sp}
+
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{minted}
+\usepackage{ebproof}
+
+\hypersetup{unicode=true,
+$if(title-meta)$
+            pdftitle={$title-meta$},
+$endif$
+$if(author-meta)$
+            pdfauthor={$author-meta$},
+$endif$
+$if(keywords)$
+            pdfkeywords={$for(keywords)$$keywords$$sep$; $endfor$},
+$endif$
+$if(colorlinks)$
+            colorlinks=true,
+            linkcolor=$if(linkcolor)$$linkcolor$$else$Maroon$endif$,
+            citecolor=$if(citecolor)$$citecolor$$else$Blue$endif$,
+            urlcolor=$if(urlcolor)$$urlcolor$$else$Blue$endif$,
+$else$
+            pdfborder={0 0 0},
+$endif$
+            breaklinks=true}
+
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+\renewcommand{\iff}{\leftrightarrow}
+\renewcommand{\implies}{\rightarrow}
+
+\begin{document}
+
+$if(title)$
+\title{$title$}
+$endif$
+$if(subtitle)$
+\subtitle{$subtitle$}
+$endif$
+
+$if(author)$
+\numberofauthors{1}
+\author{
+  $for(author)$
+  \alignauthor $author$
+  $endfor$}
+$endif$
+
+\date{$date$}
+
+
+\maketitle
+$if(abstract)$
+\begin{abstract}
+$abstract$
+\end{abstract}
+$endif$
+
+% % A category with the (minimum) three required fields
+% \category{H.4}{Information Systems Applications}{Miscellaneous}
+% %A category including the fourth, optional field follows...
+% \category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
+
+% \terms{Theory}
+
+$if(keywords)$
+\keywords{$for(keywords)$$keywords$$sep$, $endfor$} % NOT required for Proceedings
+$endif$
+
+% \section{Introduction}
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+% Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+
+% Citation of Einstein paper~\cite{Einstein}.
+
+% \section{Results and Discussions}
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% \bibliographystyle{abbrv}
+% \bibliography{sample}
+
+$body$
+
+\balancecolumns
+
+\end{document}
