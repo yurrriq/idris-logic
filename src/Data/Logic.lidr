@@ -13,6 +13,9 @@ keywords:
 - logic
 - coq
 - idris
+# header-includes:
+# - \renewcommand{\iff}{\leftrightarrow}
+# - \renewcommand{\implies}{\rightarrow}
 pandoc-minted:
   language: idris
 ---
@@ -85,7 +88,7 @@ Not a = a -> Void
 ```idris
 data Either : Type -> Type -> Type where
      Left   : a -> Either a b
-     Right  : b -> Either a b     
+     Right  : b -> Either a b
 ```
 
 \newpage
@@ -94,9 +97,11 @@ data Either : Type -> Type -> Type where
 
 [Proof Wiki](https://proofwiki.org/wiki/Definition:Biconditional)
 
-$\varphi \vdash \psi$\
-$\underline{\psi \vdash \varphi}$\
-$\varphi \iff \psi$
+\begin{prooftree*}
+  \Hypo{ \varphi \vdash \psi }
+  \Hypo{ \psi \vdash \varphi }
+  \Infer2{ \vdash \varphi \iff \psi }
+\end{prooftree*}
 
 `iff a b`, written `a <-> b`, expresses the equivalence of `a` and `b`.
 
@@ -112,7 +117,10 @@ $\varphi \iff \psi$
 
 [Proof Wiki](https://proofwiki.org/wiki/Biconditional_is_Reflexive)
 
-$\vdash \varphi \iff \varphi$
+\begin{prooftree*}
+  \Hypo { \varphi \vdash \varphi }
+  \Infer1[$\mathcal I$]{ \vdash \varphi \iff \varphi }
+\end{prooftree*}
 
 > ||| The biconditional operator is reflexive.
 > iffRefl : a <-> a
@@ -122,13 +130,16 @@ $\vdash \varphi \iff \varphi$
 
 [Proof Wiki](https://proofwiki.org/wiki/Biconditional_is_Transitive)
 
-\[
-  \begin{prooftree}
-    \Hypo{ \varphi \iff \psi }
-    \Hypo{ \psi \iff \chi }
-    \Infer2 { \vdash \varphi \iff \chi }
-  \end{prooftree}
-\]
+\begin{prooftree*}
+  \Hypo{ (\varphi \iff \psi) \land (\psi \iff \chi) }
+  \ebproofset{left label=$\land \mathcal E_1$}
+  \ebproofset{right label=$\land \mathcal E_2$}
+  \Infer1{ \varphi \iff \psi \quad\quad\quad \psi \iff \chi }
+  \ebproofset{left label=}
+  \ebproofset{right label=}
+  \Infer1{ \varphi \iff \chi }
+  \Infer1[$\mathcal I$]{ ((\varphi \iff \psi) \land (\psi \iff \chi)) \implies (\varphi \iff \chi) }
+\end{prooftree*}
 
 > ||| The biconditional operator is transitive.
 > iffTrans : (a <-> b) -> (b <-> c) -> (a <-> c)
@@ -139,11 +150,39 @@ $\vdash \varphi \iff \varphi$
 
 [Proof Wiki](https://proofwiki.org/wiki/Biconditional_is_Commutative)
 
-$\varphi \iff \psi \dashv\vdash \psi \iff \varphi$
+\resizebox{0.5\textwidth}{!}{
+  \begin{prooftree}
+    \Hypo{ \varphi \iff \psi }
+    \Infer1{ (\varphi \implies \psi) \land (\psi \implies \varphi) }
+    \Infer1{ (\psi \implies \varphi) \land (\varphi \implies \psi) }
+    \Infer1{ \psi \iff \varphi }
 
-or
+    \Hypo{ \psi \iff \varphi }
+    \Infer1{ (\psi \implies \varphi) \land (\varphi \implies \psi) }
+    \Infer1{ (\varphi \implies \psi) \land (\psi \implies \varphi) }
+    \Infer1 { \varphi \implies \psi }
 
-$\vdash (\varphi \iff \psi) \iff (\psi \iff \varphi)$
+    \Infer2{ \varphi \iff \psi \dashv\vdash \psi \iff \varphi }
+  \end{prooftree}
+}
+
+\begin{center}or\end{center}
+
+\resizebox{0.5\textwidth}{!}{
+  \begin{prooftree}
+    \Hypo{ \varphi \iff \psi }
+    \Infer1{ \psi \iff \varphi }
+    \Infer1[$\implies \mathcal I$]{ (\varphi \iff \psi) \implies (\psi \iff \varphi) }
+
+    \Hypo{ \varphi \iff \psi }
+    \Infer1{ \psi \iff \varphi }
+    \Infer1[$\implies \mathcal I$]{ (\varphi \iff \psi) \implies (\psi \iff \varphi) }
+
+    \Infer2{ (\varphi \iff \psi) \iff (\psi \iff \varphi) }
+  \end{prooftree}
+}
+
+==== Source
 
 > ||| The biconditional operator is commutative.
 > iffSym : (a <-> b) -> (b <-> a)
@@ -152,6 +191,13 @@ $\vdash (\varphi \iff \psi) \iff (\psi \iff \varphi)$
 === andIffCompatLeft
 
 $\psi \iff \chi \dashv\vdash (\varphi \land \psi) \iff (\varphi \land \chi)$
+
+\begin{prooftree}
+  \Hypo{ \Gamma, \varphi \vdash \psi \iff \chi }
+  \ebproofset{left label=$\land \mathcal E_1$}
+  \ebproofset{right label=$\land \mathcal E_2$}
+  \Infer1{ \Gamma, \varphi \implies \psi \vdash \chi &\Gamma, \varphi \vdash \chi \implies \psi }
+\end{prooftree}
 
 > andIffCompatLeft : (b <-> c) -> ((a, b) <-> (a, c))
 > andIffCompatLeft = bimap second second
@@ -204,6 +250,8 @@ $((\varphi \land \psi) \iff (\varphi \land \chi)) \iff (\psi \iff \chi)$
 >     f h b = proj2 . h $ Conj (ba b) b
 >     g h c = proj2 . h $ Conj (ca c) c
 
+\newpage
+
 === andCancelRight
 
 > andCancelRight : (b -> a) ->
@@ -213,8 +261,6 @@ $((\varphi \land \psi) \iff (\varphi \land \chi)) \iff (\psi \iff \chi)$
 >   where
 >     f h b = proj1 . h $ Conj b (ba b)
 >     g h c = proj1 . h $ Conj c (ca c)
-
-\newpage
 
 === Conjunction is Commutative
 
@@ -271,8 +317,6 @@ $(\psi \implies \neg \varphi) \implies (\chi \implies \neg \varphi) \implies (((
 >     g eg c = go (cNotA c) (eg (Right c))
 >     go : (~a) -> Either a b -> b
 >     go lf = either (void . lf) id
-
-\newpage
 
 === orCancelRight
 
@@ -332,8 +376,6 @@ $\vdash ((\varphi \lor \psi) \lor \chi) \iff (\varphi \lor (\psi \lor \chi))$
 > orAssoc : Either (Either a b) c <->
 >           Either a (Either b c)
 > orAssoc = Conj orAssocLeft orAssocRight
-
-\newpage
 
 === iffAnd
 

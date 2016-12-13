@@ -13,9 +13,6 @@
             breaklinks=true}
 
 
-\renewcommand{\iff}{\leftrightarrow}
-\renewcommand{\implies}{\rightarrow}
-
 \begin{document}
 
 \title{Logic}
@@ -151,7 +148,7 @@ proj2 (Conj _ b) = b
 \begin{minted}[]{idris}
 data Either : Type -> Type -> Type where
      Left   : a -> Either a b
-     Right  : b -> Either a b     
+     Right  : b -> Either a b
 \end{minted}
 
 \newpage
@@ -160,9 +157,11 @@ data Either : Type -> Type -> Type where
 
 \href{https://proofwiki.org/wiki/Definition:Biconditional}{Proof Wiki}
 
-\(\varphi \vdash \psi\)\\
-\(\underline{\psi \vdash \varphi}\)\\
-\(\varphi \iff \psi\)
+\begin{prooftree*}
+  \Hypo{ \varphi \vdash \psi }
+  \Hypo{ \psi \vdash \varphi }
+  \Infer2{ \vdash \varphi \iff \psi }
+\end{prooftree*}
 
 \mintinline[]{idris}{iff a b}, written \mintinline[]{idris}{a <-> b},
 expresses the equivalence of \mintinline[]{idris}{a} and
@@ -183,7 +182,10 @@ Reflexive}\label{biconditional-is-reflexive}
 
 \href{https://proofwiki.org/wiki/Biconditional_is_Reflexive}{Proof Wiki}
 
-\(\vdash \varphi \iff \varphi\)
+\begin{prooftree*}
+  \Hypo { \varphi \vdash \varphi }
+  \Infer1[$\mathcal I$]{ \vdash \varphi \iff \varphi }
+\end{prooftree*}
 
 \begin{minted}[]{idris}
 ||| The biconditional operator is reflexive.
@@ -197,13 +199,16 @@ Transitive}\label{biconditional-is-transitive}
 \href{https://proofwiki.org/wiki/Biconditional_is_Transitive}{Proof
 Wiki}
 
-\[
-  \begin{prooftree}
-    \Hypo{ \varphi \iff \psi }
-    \Hypo{ \psi \iff \chi }
-    \Infer2 { \vdash \varphi \iff \chi }
-  \end{prooftree}
-\]
+\begin{prooftree*}
+  \Hypo{ (\varphi \iff \psi) \land (\psi \iff \chi) }
+  \ebproofset{left label=$\land \mathcal E_1$}
+  \ebproofset{right label=$\land \mathcal E_2$}
+  \Infer1{ \varphi \iff \psi \quad\quad\quad \psi \iff \chi }
+  \ebproofset{left label=}
+  \ebproofset{right label=}
+  \Infer1{ \varphi \iff \chi }
+  \Infer1[$\mathcal I$]{ ((\varphi \iff \psi) \land (\psi \iff \chi)) \implies (\varphi \iff \chi) }
+\end{prooftree*}
 
 \begin{minted}[]{idris}
 ||| The biconditional operator is transitive.
@@ -218,11 +223,39 @@ Commutative}\label{biconditional-is-commutative}
 \href{https://proofwiki.org/wiki/Biconditional_is_Commutative}{Proof
 Wiki}
 
-\(\varphi \iff \psi \dashv\vdash \psi \iff \varphi\)
+\resizebox{0.5\textwidth}{!}{
+  \begin{prooftree}
+    \Hypo{ \varphi \iff \psi }
+    \Infer1{ (\varphi \implies \psi) \land (\psi \implies \varphi) }
+    \Infer1{ (\psi \implies \varphi) \land (\varphi \implies \psi) }
+    \Infer1{ \psi \iff \varphi }
 
-or
+    \Hypo{ \psi \iff \varphi }
+    \Infer1{ (\psi \implies \varphi) \land (\varphi \implies \psi) }
+    \Infer1{ (\varphi \implies \psi) \land (\psi \implies \varphi) }
+    \Infer1 { \varphi \implies \psi }
 
-\(\vdash (\varphi \iff \psi) \iff (\psi \iff \varphi)\)
+    \Infer2{ \varphi \iff \psi \dashv\vdash \psi \iff \varphi }
+  \end{prooftree}
+}
+
+\begin{center}or\end{center}
+
+\resizebox{0.5\textwidth}{!}{
+  \begin{prooftree}
+    \Hypo{ \varphi \iff \psi }
+    \Infer1{ \psi \iff \varphi }
+    \Infer1[$\implies \mathcal I$]{ (\varphi \iff \psi) \implies (\psi \iff \varphi) }
+
+    \Hypo{ \varphi \iff \psi }
+    \Infer1{ \psi \iff \varphi }
+    \Infer1[$\implies \mathcal I$]{ (\varphi \iff \psi) \implies (\psi \iff \varphi) }
+
+    \Infer2{ (\varphi \iff \psi) \iff (\psi \iff \varphi) }
+  \end{prooftree}
+}
+
+\paragraph{Source}\label{source}
 
 \begin{minted}[]{idris}
 ||| The biconditional operator is commutative.
@@ -233,6 +266,13 @@ iffSym (Conj ab ba) = Conj ba ab
 \subsubsection{andIffCompatLeft}\label{andiffcompatleft}
 
 \(\psi \iff \chi \dashv\vdash (\varphi \land \psi) \iff (\varphi \land \chi)\)
+
+\begin{prooftree}
+  \Hypo{ \Gamma, \varphi \vdash \psi \iff \chi }
+  \ebproofset{left label=$\land \mathcal E_1$}
+  \ebproofset{right label=$\land \mathcal E_2$}
+  \Infer1{ \Gamma, \varphi \implies \psi \vdash \chi &\Gamma, \varphi \vdash \chi \implies \psi }
+\end{prooftree}
 
 \begin{minted}[]{idris}
 andIffCompatLeft : (b <-> c) -> ((a, b) <-> (a, c))
@@ -297,6 +337,8 @@ andCancelLeft ba ca = Conj (bimap f g) andIffCompatLeft
     g h c = proj2 . h $ Conj (ca c) c
 \end{minted}
 
+\newpage
+
 \subsubsection{andCancelRight}\label{andcancelright}
 
 \begin{minted}[]{idris}
@@ -308,8 +350,6 @@ andCancelRight ba ca = Conj (bimap f g) andIffCompatRight
     f h b = proj1 . h $ Conj b (ba b)
     g h c = proj1 . h $ Conj c (ca c)
 \end{minted}
-
-\newpage
 
 \subsubsection{Conjunction is
 Commutative}\label{conjunction-is-commutative}
@@ -325,7 +365,7 @@ Wiki}
 
 \(\vdash (\varphi \land \psi) \iff (\psi \land \varphi)\)
 
-\paragraph{Source}\label{source}
+\paragraph{Source}\label{source-1}
 
 \begin{minted}[]{idris}
 ||| Conjunction is commutative.
@@ -350,7 +390,7 @@ Wiki}
 
 \(\vdash ((\varphi \land \psi) \land \chi) \iff (\varphi \land (\psi \land \chi))\)
 
-\paragraph{Source}\label{source-1}
+\paragraph{Source}\label{source-2}
 
 \begin{minted}[]{idris}
 ||| Conjunction is associative.
@@ -380,8 +420,6 @@ orCancelLeft bNotA cNotA =
     go : (~a) -> Either a b -> b
     go lf = either (void . lf) id
 \end{minted}
-
-\newpage
 
 \subsubsection{orCancelRight}\label{orcancelright}
 
@@ -449,7 +487,7 @@ orAssocRight = either (Left . Left) (first Right)
 
 \(\vdash ((\varphi \lor \psi) \lor \chi) \iff (\varphi \lor (\psi \lor \chi))\)
 
-\paragraph{Source}\label{source-2}
+\paragraph{Source}\label{source-3}
 
 \begin{minted}[]{idris}
 ||| Disjunction is associative.
@@ -457,8 +495,6 @@ orAssoc : Either (Either a b) c <->
           Either a (Either b c)
 orAssoc = Conj orAssocLeft orAssocRight
 \end{minted}
-
-\newpage
 
 \subsubsection{iffAnd}\label{iffand}
 
